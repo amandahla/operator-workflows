@@ -151,11 +151,11 @@ jobs:
           fi
           tox -e integration -- --model testing $series $args ${{ inputs.extra-arguments }}
       - name: Set UNIT_ADDRESS env
-      	run: |
-      	  jq -V
-      	  juju status
-      	  juju status --format=json | jq -r '.applications."'$CHARM_NAME'".units."'$CHARM_NAME/0'".address'
-      	  echo "UNIT_ADDRESS=$(juju status --format=json | jq -r '.applications."'$CHARM_NAME'".units."'$CHARM_NAME/0'".address')" >> $GITHUB_ENV
+        run: |
+          jq -V
+          juju status
+          juju status --format=json | jq -r '.applications."'$CHARM_NAME'".units."'$CHARM_NAME/0'".address'
+          echo "UNIT_ADDRESS=$(juju status --format=json | jq -r '.applications."'$CHARM_NAME'".units."'$CHARM_NAME/0'".address')" >> $GITHUB_ENV
       - name: Run load test
         run: |
           ./k6 run loadtest.js --out json=results.json
