@@ -129,6 +129,10 @@ jobs:
       - name: Pre-run script
         if: ${{ inputs.pre-run-script != '' }}
         run: bash ${{ inputs.pre-run-script }}
+      - name: Install k6
+        run: |
+            curl -sL https://github.com/grafana/k6/releases/download/v0.41.0/k6-v0.41.0-linux-amd64.tar.gz -o k6-v0.41.0-linux-amd64.tar.gz
+            tar zxvf k6-v0.41.0-linux-amd64.tar.gz k6-v0.41.0-linux-amd64/k6  --strip-components 1
       - name: Run integration tests
         run: |
           echo "CHARM_NAME=$(yq '.name' metadata.yaml)" >> $GITHUB_ENV
@@ -146,6 +150,21 @@ jobs:
             series="--series ${{ matrix.series }}"
           fi
           tox -e integration -- --model testing $series $args ${{ inputs.extra-arguments }}
+      - name: Set UNIT_ADDRESS env
+      	run: |
+      	  jq -V
+      	  juju status
+      	  juju status --format=json | jq -r '.applications."'$CHARM_NAME'".units."'$CHARM_NAME/0'".address'
+      	  echo "UNIT_ADDRESS=$(juju status --format=json | jq -r '.applications."'$CHARM_NAME'".units."'$CHARM_NAME/0'".address')" >> $GITHUB_ENV
+      - name: Run load test
+        run: |
+          ./k6 run loadtest.js --out json=results.json
+      - name: Upload load test result
+        uses: actions/upload-artifact@v3
+        if: always() && github.event_name == 'pull_request'
+        with:
+          name: loadtest
+          path: results.json
       - name: Dump logs
         uses: canonical/charm-logdump-action@main
         if: failure()
