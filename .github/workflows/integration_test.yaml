@@ -275,7 +275,8 @@ jobs:
           ZAP_AUTH_HEADER:  ${{ inputs.zap-auth-header }}
           ZAP_AUTH_HEADER_VALUE:  ${{ inputs.zap-auth-header-value  }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          issue_title: 'ZAP report'
+          fail_action: true
           target: ${{ inputs.zap-target-protocol }}://${{ env.ZAP_TARGET }}:${{ inputs.zap-target-port }}/
   required_status_checks:
     name: Required Integration Test Status Checks
