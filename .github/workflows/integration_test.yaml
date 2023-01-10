@@ -76,7 +76,7 @@ on:
       zap-target-port:
         description:  ZAP target port
         type: string
-        default: "80"
+        default: 80
     outputs:
       images:
         description: Pushed docker images
@@ -242,6 +242,7 @@ jobs:
           APP_NS: ${{ inputs.chaos-app-namespace }}
 
       - name: Run Litmus Chaos experiments
+        if: ${{ inputs.chaos-enabled }}
         uses: merkata/github-chaos-actions@feat/run-multiple-scenarios
         env:
           EXPERIMENT_NAME: ${{ inputs.chaos-experiments }}
