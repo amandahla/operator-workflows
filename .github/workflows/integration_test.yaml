@@ -167,7 +167,7 @@ jobs:
       - name: Create OpenStack credential file
         run: echo "${{ steps.setup-devstack-swift.outputs.credentials }}" > openrc
       - name: Setup operator environment
-        uses: charmed-kubernetes/actions-operator@main
+        uses: charmed-kubernetes/actions-operator@ced11ec027a9849a9d8b8b635905b24880dd4ee0
         with:
           provider: ${{ inputs.provider }}
       - name: Enable microk8s registry
