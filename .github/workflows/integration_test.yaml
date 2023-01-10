@@ -53,6 +53,30 @@ on:
         type: string
         description: Duration of the chaos experiment
         default: 60
+      zap-dast-enabled:
+        type: boolean
+        description: Whether OWASP ZAP DAST is enabled
+        default: false
+      zap-auth-header:
+        description: If this is defined then its value will be added as a header to all of the ZAP requests
+        type: string
+        default: ""
+      zap-auth-header-value:
+        description:  If this is defined then its value will be used as the header name to all of the ZAP requests
+        type: string
+        default: ""
+      zap-target:
+        description:  If this is not set, the unit IP address will be used as ZAP target
+        type: string
+        default: ""
+      zap-target-protocol:
+        description:  ZAP target protocol
+        type: string
+        default: "http"
+      zap-target-port:
+        description:  ZAP target port
+        type: string
+        default: "80"
     outputs:
       images:
         description: Pushed docker images
@@ -226,6 +250,24 @@ jobs:
           APP_LABEL: ${{ inputs.chaos-app-label }}
           APP_KIND: ${{ inputs.chaos-app-kind }}
           TOTAL_CHAOS_DURATION: ${{ inputs.chaos-duration }}
+
+      - name: Setting up Zap target env for Github Zap Action if target is not set
+        if: ${{ inputs.zap-dast-enabled }} && ${{ inputs.zap-target == '' }}
+        run: echo ::set-env name=ZAP_TARGET::$(juju show-unit ${{ env.CHARM_NAME }}/0 --format=json | jq -r '.["${{ env.CHARM_NAME }}/0"]["address"]')
+
+      - name: Setting up Zap target env for Github Zap Action if target is set
+        if: ${{ inputs.zap-dast-enabled }} && ${{ inputs.zap-target != '' }}
+        run: echo ::set-env name=ZAP_TARGET::${{ inputs.zap-target }}
+
+      - name: Run OWASP ZAP Full Scan
+        if: ${{ inputs.zap-dast-enabled }}
+        uses: zaproxy/action-full-scan@v0.4.0
+        env:
+          ZAP_AUTH_HEADER:  ${{ inputs.zap-auth-header }}
+          ZAP_AUTH_HEADER_VALUE:  ${{ inputs.zap-auth-header-value  }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: ${{ inputs.zap-target-protocol }}://${{ env.ZAP_TARGET }}:${{ inputs.zap-target-port }}/
   required_status_checks:
     name: Required Integration Test Status Checks
     runs-on: ubuntu-latest
