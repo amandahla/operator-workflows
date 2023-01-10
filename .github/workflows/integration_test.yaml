@@ -77,6 +77,10 @@ on:
         description:  ZAP target port
         type: string
         default: 80
+      zap-before-command:
+        description: Command to run before ZAP testing
+        type: string
+        default: ""
     outputs:
       images:
         description: Pushed docker images
@@ -259,6 +263,10 @@ jobs:
       - name: Setting up Zap target env for Github Zap Action if target is set
         if: ${{ inputs.zap-dast-enabled }} && ${{ inputs.zap-target != '' }}
         run: echo ::set-env name=ZAP_TARGET::${{ inputs.zap-target }}
+
+      - name: Setting up Zap target env for Github Zap Action if target is set
+        if: ${{ inputs.zap-dast-enabled }} && ${{ inputs.zap-before-command != '' }}
+        run: ${{ inputs.zap-before-command }}
 
       - name: Run OWASP ZAP Full Scan
         if: ${{ inputs.zap-dast-enabled }}
