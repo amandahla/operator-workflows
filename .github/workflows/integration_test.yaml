@@ -64,15 +64,12 @@ on:
       zap-auth-header:
         description: If this is defined then its value will be added as a header to all of the ZAP requests
         type: string
-        default: ""
       zap-auth-header-value:
         description:  If this is defined then its value will be used as the header name to all of the ZAP requests
         type: string
-        default: ""
       zap-target:
         description:  If this is not set, the unit IP address will be used as ZAP target
         type: string
-        default: ""
       zap-target-protocol:
         description:  ZAP target protocol
         type: string
@@ -84,7 +81,6 @@ on:
       zap-before-command:
         description: Command to run before ZAP testing
         type: string
-        default: ""
     outputs:
       images:
         description: Pushed docker images
