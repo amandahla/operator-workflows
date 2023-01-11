@@ -80,7 +80,7 @@ on:
       zap-options:
         description: Options to be used by ZAP
         type: string
-        default: "-j zap-dast-report.json"
+        default: "-j zap-dast-report.json -T 60"
     outputs:
       images:
         description: Pushed docker images
