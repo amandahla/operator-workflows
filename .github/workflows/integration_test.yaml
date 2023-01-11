@@ -53,6 +53,10 @@ on:
         type: string
         description: Duration of the chaos experiment
         default: 60
+      skip-integration-tests:
+        description: In case you just want to run the others
+        type: boolean
+        default: false
       zap-dast-enabled:
         type: boolean
         description: Whether OWASP ZAP DAST is enabled
@@ -204,9 +208,12 @@ jobs:
       - name: Pre-run script
         if: ${{ inputs.pre-run-script != '' }}
         run: bash ${{ inputs.pre-run-script }}
+      - name: Set charm name
+        run: echo "CHARM_NAME=$([ -f metadata.yaml ] && yq '.name' metadata.yaml || echo UNKNOWN)" >> $GITHUB_ENV
+
       - name: Run integration tests
+        if: ! ${{ inputs.skip-integration-tests }}
         run: |
-          echo "CHARM_NAME=$([ -f metadata.yaml ] && yq '.name' metadata.yaml || echo UNKNOWN)" >> $GITHUB_ENV
           args=""
           for image_name in $(echo '${{ needs.get-images.outputs.images }}' | jq -cr '.[]'); do
             if [ ${{ github.event.pull_request.head.repo.fork }} = "true" ]; then
