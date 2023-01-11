@@ -81,6 +81,10 @@ on:
       zap-before-command:
         description: Command to run before ZAP testing
         type: string
+      zap-options:
+        description: Options to be used by ZAP
+        type: string
+        default: "-j zap-dast-report.json"
     outputs:
       images:
         description: Pushed docker images
@@ -281,6 +285,7 @@ jobs:
           issue_title: 'ZAP report'
           fail_action: true
           target: ${{ inputs.zap-target-protocol }}://${{ env.ZAP_TARGET }}:${{ inputs.zap-target-port }}/
+          cmd_options: ${{ inputs.zap-options }}
   required_status_checks:
     name: Required Integration Test Status Checks
     runs-on: ubuntu-latest
