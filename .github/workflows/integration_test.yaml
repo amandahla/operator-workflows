@@ -274,6 +274,8 @@ jobs:
       - name: Run command before Github Zap Action
         if: ${{ inputs.zap-dast-enabled && inputs.zap-before-command != '' }}
         run: ${{ inputs.zap-before-command }}
+        env:
+          ZAP_TARGET: ${{ env.ZAP_TARGET }}
 
       - name: Run Github Zap Action
         if: ${{ inputs.zap-dast-enabled }}
